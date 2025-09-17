@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { insertEmojiGeneration } from "@/lib/supabase";
+import { insertEmojiGeneration, getLatestGenerationRecord } from "@/lib/supabase";
 
 // 豆包大模型API配置
 const DOUBAO_API_BASE = "https://ark.cn-beijing.volces.com/api/v3";
@@ -58,6 +58,21 @@ export async function POST(request: NextRequest) {
     // 验证必要参数
     if (!image || !style) {
       return NextResponse.json({ error: "Missing required parameters: image and style" }, { status: 400 });
+    }
+
+    // 非测试模式下检查频率限制
+    if (!isTestMode) {
+      const rateLimitResult = await checkRateLimit();
+      if (!rateLimitResult.allowed) {
+        return NextResponse.json(
+          {
+            error: rateLimitResult.message || "请求过于频繁，请稍后再试",
+            waitMinutes: rateLimitResult.waitMinutes,
+            remainingCount: rateLimitResult.remainingCount || 0,
+          },
+          { status: 429 }
+        );
+      }
     }
 
     // 测试模式：返回模拟数据，不调用大模型
@@ -297,4 +312,43 @@ export async function GET() {
     timestamp: new Date().toISOString(),
     model: DOUBAO_MODEL,
   });
+}
+
+// 检查服务器每小时生成限制
+async function checkRateLimit(): Promise<{ allowed: boolean; remainingCount?: number; message?: string; waitMinutes?: number }> {
+  try {
+    const latestRecord = await getLatestGenerationRecord();
+
+    if (!latestRecord) {
+      // 没有生成记录，允许生成
+      return { allowed: true, remainingCount: 1 };
+    }
+
+    const lastGenerationTime = new Date(latestRecord.created_at);
+    const currentTime = new Date();
+    const timeDiffMs = currentTime.getTime() - lastGenerationTime.getTime();
+    const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
+    const oneHourInMinutes = 60;
+
+    if (timeDiffMinutes < oneHourInMinutes) {
+      // 距离上次生成不足一小时
+      const waitMinutes = oneHourInMinutes - timeDiffMinutes;
+      return {
+        allowed: false,
+        remainingCount: 0,
+        waitMinutes: waitMinutes,
+        message: `AI image generation model is busy, please try again in ${waitMinutes} minutes`,
+      };
+    } else {
+      // 距离上次生成超过一小时，允许生成
+      return {
+        allowed: true,
+        remainingCount: 1,
+      };
+    }
+  } catch (error) {
+    console.error("Error checking rate limit:", error);
+    // 出错时允许生成，避免阻塞用户
+    return { allowed: true };
+  }
 }

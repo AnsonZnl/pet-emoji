@@ -1,0 +1,25 @@
+{
+  "name": "Pet Emoji Generator",
+  "short_name": "Pet Emoji",
+  "description": "Transform your pet photos into adorable emojis with AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["photo", "entertainment", "utilities"],
+  "lang": "en",
+  "scope": "/"
+}

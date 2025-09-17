@@ -183,3 +183,26 @@ export async function getEmojiStats() {
 
   return stats
 }
+
+// 获取最新的生成记录（用于服务器频率限制）
+export async function getLatestGenerationRecord() {
+  if (!supabase) {
+    console.warn('Supabase not configured, skipping database query');
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('emoji_generations')
+    .select('created_at')
+    .eq('status', 'completed')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+    console.error('Error getting latest generation record:', error)
+    throw error
+  }
+
+  return data
+}

@@ -9,7 +9,7 @@ const structuredData = {
   "@type": "WebApplication",
   name: "Pet Emoji Generator",
   description: "AI-powered pet emoji generator that transforms your pet photos into adorable emojis",
-  url: "https://pet-emoji.com",
+  url: "https://www.petemojimaker.com",
   applicationCategory: "MultimediaApplication",
   operatingSystem: "Web Browser",
   offers: {
@@ -60,7 +60,7 @@ export default async function Home() {
               Get Started
             </ScrollButton>
           </div>
-          <div className='mt-8 flex justify-center items-center space-x-2 text-sm text-gray-500'>
+          <div className='mt-8 flex justify-center items-center space-x-2 text-xl'>
             <span>✨ Free</span>
             <span>•</span>
             <span>⚡ Fast</span>
