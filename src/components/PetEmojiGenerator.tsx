@@ -115,8 +115,9 @@ export default function PetEmojiGenerator() {
 
       const result = await response.json();
       
-      if (result.success && result.emojis) {
-        setGeneratedEmojis(result.emojis);
+      if (result.success && result.emoji) {
+        // 将单个emoji对象转换为数组以保持现有组件逻辑
+        setGeneratedEmojis([result.emoji]);
       } else {
         throw new Error('Invalid response format');
       }

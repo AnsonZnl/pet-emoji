@@ -12,7 +12,8 @@ const R2_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const R2_ACCESS_KEY_ID = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
 const R2_SECRET_ACCESS_KEY = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY;
 const R2_ENDPOINT = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-const R2_PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL || `https://pub-${R2_ACCOUNT_ID}.r2.dev`;
+// 修复R2公共URL格式 - 使用正确的pub-前缀格式
+const R2_PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL;
 
 interface GenerateEmojiRequest {
   image: string; // base64编码的图片
@@ -275,11 +276,14 @@ Additional critical requirements:
       // 不影响主要功能，只记录错误
     }
 
+    // 只返回前端需要的字段 - 直接返回单个对象而不是数组
     return NextResponse.json({
       success: true,
-      emojis: emojis,
-      usage: result.usage,
-      model: result.model,
+      emoji: {
+        id: emojis[0].id,
+        url: emojis[0].url,
+        style: emojis[0].style,
+      },
     });
   } catch (error) {
     console.error("Generate emoji error:", error);
