@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import Image from "next/image";
+import Link from "next/link";
 
 interface GeneratedEmoji {
   id: string;
@@ -15,6 +16,10 @@ export default function PetEmojiGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedEmojis, setGeneratedEmojis] = useState<GeneratedEmoji[]>([]);
   const [dragActive, setDragActive] = useState(false);
+
+  // 检查是否为测试模式
+  const isTestMode = typeof window !== 'undefined' && 
+    new URLSearchParams(window.location.search).get('test') === 'true';
 
   const styles = [
     { id: 'cute', name: 'Cute', emoji: '😊', description: '萌萌哒' },
@@ -72,8 +77,19 @@ export default function PetEmojiGenerator() {
 
     setIsGenerating(true);
     try {
-      // 调用豆包大模型API生成表情包
-      const response = await fetch('/api/generate-emoji', {
+      // 检查URL是否包含test参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const isTestMode = urlParams.get('test') === 'true';
+      
+      // 构建API URL，测试模式下添加test参数
+      const apiUrl = isTestMode ? '/api/generate-emoji?test=true' : '/api/generate-emoji';
+      
+      if (isTestMode) {
+        console.log('🧪 Test mode: Using mock data instead of calling AI model');
+      }
+
+      // 调用API生成表情包
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,6 +163,25 @@ export default function PetEmojiGenerator() {
 
   return (
     <>
+      {/* 测试模式提示 */}
+      {isTestMode && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <span className="text-yellow-400 text-xl">🧪</span>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                 <strong>测试模式已启用</strong> - 将使用模拟数据，不会调用AI模型，节省费用。
+                 <Link href="/" className="ml-2 underline hover:text-yellow-800">
+                   退出测试模式
+                 </Link>
+               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Upload Section */}
       <section id="upload-section" className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">

@@ -1,5 +1,7 @@
 import PetEmojiGenerator from '@/components/PetEmojiGenerator';
 import ScrollButton from '@/components/ScrollButton';
+import EmojiGallery from '@/components/EmojiGallery';
+import { getEmojiGenerations } from '@/lib/supabase';
 
 // 结构化数据用于SEO
 const structuredData = {
@@ -21,7 +23,26 @@ const structuredData = {
   }
 };
 
-export default function Home() {
+export default async function Home() {
+  // 获取初始的表情包数据用于首页展示
+  let initialEmojis = [];
+  let initialPagination = undefined;
+  
+  try {
+    const result = await getEmojiGenerations({ page: 1, limit: 12 });
+    initialEmojis = result.data;
+    initialPagination = {
+      page: result.page,
+      limit: result.limit,
+      total: result.count,
+      totalPages: result.totalPages,
+      hasNext: result.page < result.totalPages,
+      hasPrev: result.page > 1
+    };
+  } catch (error) {
+    console.error('Error fetching initial emojis:', error);
+    // 如果获取失败，使用空数组，组件会在客户端重新获取
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       {/* 结构化数据 */}
@@ -108,6 +129,25 @@ export default function Home() {
               </p>
             </article>
           </div>
+        </div>
+      </section>
+
+      {/* 表情包画廊 - 展示数据库中的生成记录 */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-white">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              精彩表情包展示
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              看看其他用户创建的精彩表情包，获取灵感，或者分享你的创作！
+            </p>
+          </div>
+          
+          <EmojiGallery 
+            initialData={initialEmojis} 
+            initialPagination={initialPagination}
+          />
         </div>
       </section>
 

@@ -6,10 +6,14 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "setup-db": "node scripts/setup-database.mjs",
+    "insert-mock": "node scripts/setup-database.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.888.0",
+    "@supabase/supabase-js": "^2.57.4",
+    "dotenv": "^17.2.2",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"

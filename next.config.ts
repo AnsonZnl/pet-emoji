@@ -21,6 +21,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      // 添加具体的R2域名支持
+      {
+        protocol: 'https',
+        hostname: '5c4526fa64900b23d9572f57b126ea45.r2.cloudflarestorage.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
