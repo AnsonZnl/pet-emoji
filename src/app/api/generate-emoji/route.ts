@@ -6,14 +6,13 @@ import { insertEmojiGeneration } from "@/lib/supabase";
 const DOUBAO_API_BASE = "https://ark.cn-beijing.volces.com/api/v3";
 const DOUBAO_MODEL = "doubao-seedream-4-0-250828"; // 使用豆包Pro模型
 
-// Cloudflare R2配置
+// Cloudflare R2 Configuration
 const R2_BUCKET_NAME = "pet-emoji";
 const R2_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const R2_ACCESS_KEY_ID = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
 const R2_SECRET_ACCESS_KEY = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY;
 const R2_ENDPOINT = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-// 修复R2公共URL格式 - 使用正确的pub-前缀格式
-const R2_PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL;
+const R2_PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL || `https://pub-a51a2574d6e74ec8b4c2cc453bfecf10.r2.dev`;
 
 interface GenerateEmojiRequest {
   image: string; // base64编码的图片

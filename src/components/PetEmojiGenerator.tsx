@@ -26,10 +26,10 @@ export default function PetEmojiGenerator() {
   }, []);
 
   const styles = [
-    { id: 'cute', name: 'Cute', emoji: '😊', description: '萌萌哒' },
-    { id: 'funny', name: 'Funny', emoji: '😂', description: '搞笑风' },
-    { id: 'angry', name: 'Angry', emoji: '😠', description: '生气脸' },
-    { id: 'happy', name: 'Happy', emoji: '😍', description: '开心果' },
+    { id: 'cute', name: 'Cute', emoji: '😊', description: 'Adorable & Sweet' },
+    { id: 'funny', name: 'Funny', emoji: '😂', description: 'Hilarious & Silly' },
+    { id: 'angry', name: 'Angry', emoji: '😠', description: 'Grumpy & Mad' },
+    { id: 'happy', name: 'Happy', emoji: '😍', description: 'Joyful & Excited' },
   ];
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -171,7 +171,7 @@ export default function PetEmojiGenerator() {
 
   return (
     <>
-      {/* 测试模式提示 */}
+      {/* Test Mode Notice */}
       {isTestMode && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
           <div className="flex">
@@ -180,9 +180,9 @@ export default function PetEmojiGenerator() {
             </div>
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                 <strong>测试模式已启用</strong> - 将使用模拟数据，不会调用AI模型，节省费用。
+                 <strong>Test Mode Enabled</strong> - Using mock data instead of AI model to save costs.
                  <Link href="/" className="ml-2 underline hover:text-yellow-800">
-                   退出测试模式
+                   Exit Test Mode
                  </Link>
                </p>
             </div>

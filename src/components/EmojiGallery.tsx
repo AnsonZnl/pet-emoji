@@ -43,12 +43,12 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
   const [selectedStyle, setSelectedStyle] = useState<string>('');
   const [error, setError] = useState<string>('');
 
-  const styles = [
-    { value: '', label: '全部风格' },
-    { value: 'cute', label: '可爱风格', emoji: '😊' },
-    { value: 'funny', label: '搞笑风格', emoji: '😂' },
-    { value: 'angry', label: '愤怒风格', emoji: '😠' },
-    { value: 'happy', label: '开心风格', emoji: '😍' }
+  const styleOptions = [
+    { value: '', label: 'All Styles' },
+    { value: 'cute', label: 'Cute Style', emoji: '😊' },
+    { value: 'funny', label: 'Funny Style', emoji: '😂' },
+    { value: 'angry', label: 'Angry Style', emoji: '😠' },
+    { value: 'happy', label: 'Happy Style', emoji: '😍' }
   ];
 
   const fetchEmojis = async (page: number = 1, style: string = '') => {
@@ -81,7 +81,7 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
       }
     } catch (err) {
       console.error('Error fetching emojis:', err);
-      setError('加载表情包失败，请稍后重试');
+      setError('Failed to load emoji packs, please try again later');
     } finally {
       setLoading(false);
     }
@@ -116,17 +116,17 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
   };
 
   const getStyleLabel = (style: string) => {
-    const styleObj = styles.find(s => s.value === style);
+    const styleObj = styleOptions.find(s => s.value === style);
     return styleObj ? `${styleObj.emoji} ${styleObj.label}` : style;
   };
 
   return (
     <div className="w-full">
-      {/* 风格筛选器 */}
+      {/* Style Filter */}
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">筛选风格</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Style</h3>
         <div className="flex flex-wrap gap-2">
-          {styles.map((style) => (
+          {styleOptions.map((style) => (
             <button
               key={style.value}
               onClick={() => handleStyleChange(style.value)}
@@ -142,28 +142,31 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
         </div>
       </div>
 
-      {/* 错误提示 */}
+      {/* Error Message */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
+        <div className="text-center py-8">
+          <div className="text-red-600 mb-4">{error}</div>
           <button
-            onClick={() => fetchEmojis(pagination.page, selectedStyle)}
-            className="mt-2 text-red-600 hover:text-red-800 underline"
+            onClick={() => {
+              setError('');
+              fetchEmojis(pagination.page, selectedStyle);
+            }}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
           >
-            重试
+            Retry
           </button>
         </div>
       )}
 
-      {/* 加载状态 */}
+      {/* Loading State */}
       {loading && (
-        <div className="flex justify-center items-center py-12">
+        <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          <span className="ml-2 text-gray-600">加载中...</span>
+          <span className="ml-2 text-gray-600">Loading...</span>
         </div>
       )}
 
-      {/* 表情包网格 */}
+      {/* Emoji Grid */}
       {!loading && emojis.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
           {emojis.map((emoji) => (
@@ -203,13 +206,13 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
                   </span>
                   {emoji.featured && (
                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                      精选
+                      Featured
                     </span>
                   )}
                 </div>
                 {emoji.pet_type && (
                   <p className="text-sm text-gray-600 mb-2">
-                    宠物类型: {emoji.pet_type}
+                    Pet Type: {emoji.pet_type}
                   </p>
                 )}
                 <p className="text-xs text-gray-500">
@@ -221,15 +224,15 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
         </div>
       )}
 
-      {/* 空状态 */}
+      {/* Empty State */}
       {!loading && emojis.length === 0 && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🎨</div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {selectedStyle ? '该风格暂无表情包' : '暂无表情包'}
+            {selectedStyle ? 'No emoji packs for this style yet' : 'No emoji packs yet'}
           </h3>
           <p className="text-gray-600 mb-4">
-            {selectedStyle ? '试试其他风格，或者' : ''}成为第一个创建表情包的用户吧！
+            {selectedStyle ? 'Try other styles, or ' : ''}Be the first to create an emoji pack!
           </p>
           <button
             onClick={() => {
@@ -238,12 +241,12 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
             }}
             className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
           >
-            开始创建
+            Start Creating
           </button>
         </div>
       )}
 
-      {/* 分页控件 */}
+      {/* Pagination Controls */}
       {!loading && emojis.length > 0 && pagination.totalPages > 1 && (
         <div className="flex justify-center items-center space-x-2">
           <button
@@ -251,7 +254,7 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
             disabled={!pagination.hasPrev}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            上一页
+            Previous
           </button>
           
           <div className="flex space-x-1">
@@ -280,15 +283,15 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
             disabled={!pagination.hasNext}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            下一页
+            Next
           </button>
         </div>
       )}
 
-      {/* 统计信息 */}
+      {/* Statistics */}
       {!loading && emojis.length > 0 && (
         <div className="mt-6 text-center text-sm text-gray-500">
-          共 {pagination.total} 个表情包，第 {pagination.page} / {pagination.totalPages} 页
+          Total {pagination.total} emoji packs, Page {pagination.page} of {pagination.totalPages}
         </div>
       )}
     </div>

@@ -132,15 +132,15 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 表情包画廊 - 展示数据库中的生成记录 */}
+      {/* Emoji Gallery - Showcase generated emoji packs */}
       <section className="px-4 py-16 sm:px-6 lg:px-8 bg-white">
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              精彩表情包展示
+              Amazing Emoji Pack Showcase
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              看看其他用户创建的精彩表情包，获取灵感，或者分享你的创作！
+              Discover incredible emoji packs created by other users, get inspired, or share your own creations!
             </p>
           </div>
           
