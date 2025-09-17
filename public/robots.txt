@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Disallow API routes from being crawled
+Disallow: /api/
+
+# Allow important pages
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.petemojimaker.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

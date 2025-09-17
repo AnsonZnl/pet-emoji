@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,10 +16,14 @@ export default function PetEmojiGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedEmojis, setGeneratedEmojis] = useState<GeneratedEmoji[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [isTestMode, setIsTestMode] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 检查是否为测试模式
-  const isTestMode = typeof window !== 'undefined' && 
-    new URLSearchParams(window.location.search).get('test') === 'true';
+  // 检查是否为测试模式 - 使用useEffect避免hydration mismatch
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    setIsTestMode(urlParams.get('test') === 'true');
+  }, []);
 
   const styles = [
     { id: 'cute', name: 'Cute', emoji: '😊', description: '萌萌哒' },
@@ -49,12 +53,14 @@ export default function PetEmojiGenerator() {
   }, []);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File input clicked', e.target.files);
     if (e.target.files && e.target.files[0]) {
       handleFile(e.target.files[0]);
     }
   };
 
   const handleFile = (file: File) => {
+    console.log('handleFile called with:', file.name, file.size, file.type);
     if (file.size > 5 * 1024 * 1024) {
       alert('File size cannot exceed 5MB');
       return;
@@ -67,6 +73,7 @@ export default function PetEmojiGenerator() {
 
     const reader = new FileReader();
     reader.onload = (e) => {
+      console.log('File read successfully');
       setUploadedImage(e.target?.result as string);
     };
     reader.readAsDataURL(file);
@@ -194,7 +201,7 @@ export default function PetEmojiGenerator() {
 
           {/* File Upload Area */}
           <div
-            className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
+            className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${
               dragActive
                 ? 'border-purple-400 bg-purple-50'
                 : uploadedImage
@@ -205,12 +212,19 @@ export default function PetEmojiGenerator() {
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
+            onClick={() => {
+              console.log('Upload area clicked');
+              if (fileInputRef.current) {
+                fileInputRef.current.click();
+              }
+            }}
           >
             <input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={handleFileInput}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             />
             
             {uploadedImage ? (
@@ -316,14 +330,25 @@ export default function PetEmojiGenerator() {
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
                 <div className="relative bg-white rounded-2xl shadow-2xl p-2 md:p-4">
-                  <Image
-                    src={generatedEmojis[0].url}
-                    alt={`${selectedStyle} pet emoji pack`}
-                    width={600}
-                    height={600}
-                    className="rounded-lg w-full max-w-[600px] h-auto"
-                    priority
-                  />
+                  {generatedEmojis[0].url.startsWith('http') ? (
+                    <img
+                      src={generatedEmojis[0].url}
+                      alt={`${selectedStyle} pet emoji pack`}
+                      className="rounded-lg w-full max-w-[600px] h-auto"
+                      onError={(e) => {
+                        console.error('Image load error:', generatedEmojis[0].url);
+                      }}
+                    />
+                  ) : (
+                    <Image
+                      src={generatedEmojis[0].url}
+                      alt={`${selectedStyle} pet emoji pack`}
+                      width={600}
+                      height={600}
+                      className="rounded-lg w-full max-w-[600px] h-auto"
+                      priority
+                    />
+                  )}
                 </div>
               </div>
             </div>

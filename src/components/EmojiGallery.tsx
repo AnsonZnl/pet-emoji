@@ -172,17 +172,29 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="aspect-square relative">
-                <Image
-                  src={emoji.image_url}
-                  alt={`${emoji.style} style emoji pack`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  onError={(e) => {
-                    console.error('Image load error:', emoji.image_url);
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
+                {emoji.image_url.startsWith('http') ? (
+                  <img
+                    src={emoji.image_url}
+                    alt={`${emoji.style} style emoji pack`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Image load error:', emoji.image_url);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <Image
+                    src={emoji.image_url}
+                    alt={`${emoji.style} style emoji pack`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    onError={(e) => {
+                      console.error('Image load error:', emoji.image_url);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
