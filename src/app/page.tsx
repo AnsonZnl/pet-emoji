@@ -92,7 +92,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Choose Emoji Style</h3>
               <p className="text-gray-600">
-                Select from cute, funny, angry, or happy styles to match your pet's personality. 
+                Select from cute, funny, angry, or happy styles to match your pet&apos;s personality. 
                 Our AI will generate multiple variations.
               </p>
             </article>
@@ -160,7 +160,7 @@ export default function Home() {
                 What makes this pet emoji generator special?
               </h3>
               <p className="text-gray-600">
-                Our AI is specifically trained for pet emoji generation, ensuring high-quality results that capture your pet's unique characteristics and personality.
+                Our AI is specifically trained for pet emoji generation, ensuring high-quality results that capture your pet&apos;s unique characteristics and personality.
               </p>
             </article>
           </div>

@@ -37,25 +37,7 @@ interface DoubaoImageResponse {
   };
 }
 
-// 流式响应事件接口
-interface DoubaoStreamEvent {
-  type: 'image_generation.partial_succeeded' | 'image_generation.partial_failed' | 'image_generation.completed';
-  model: string;
-  created: number;
-  image_index?: number;
-  url?: string;
-  b64_json?: string;
-  size?: string;
-  error?: {
-    code: string;
-    message: string;
-  };
-  usage?: {
-    generated_images: number;
-    output_tokens: number;
-    total_tokens: number;
-  };
-}
+
 
 // 提示词模板
 const PROMPT_TEMPLATES = {

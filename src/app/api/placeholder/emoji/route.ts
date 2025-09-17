@@ -13,7 +13,6 @@ function generateGridSVG(style: string): string {
   const gridSize = 3;
   const cellSize = 200;
   const totalSize = cellSize * gridSize;
-  const padding = 5;
   
   return `
     <svg width="${totalSize}" height="${totalSize}" viewBox="0 0 ${totalSize} ${totalSize}" xmlns="http://www.w3.org/2000/svg">
@@ -50,7 +49,7 @@ function generateGridSVG(style: string): string {
 }
 
 // 生成单个SVG占位符表情包
-function generatePlaceholderSVG(style: string, id: string, text?: string): string {
+function generatePlaceholderSVG(style: string, id: string): string {
   const colors = {
     cute: { bg: '#FFB6C1', emoji: '😊', border: '#FF69B4' },
     funny: { bg: '#FFD700', emoji: '😂', border: '#FFA500' },
@@ -59,7 +58,6 @@ function generatePlaceholderSVG(style: string, id: string, text?: string): strin
   };
 
   const config = colors[style as keyof typeof colors] || colors.cute;
-  const displayText = text ? text.substring(0, 20) + '...' : `${style} pet emoji`;
 
   return `
     <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
@@ -101,7 +99,6 @@ export async function GET(request: NextRequest) {
   const style = searchParams.get('style') || 'cute';
   const type = searchParams.get('type');
   const id = searchParams.get('id') || '1';
-  const text = searchParams.get('text');
   const provider = searchParams.get('provider');
 
   // 根据类型生成不同的SVG
@@ -109,7 +106,7 @@ export async function GET(request: NextRequest) {
   if (type === 'grid') {
     svg = generateGridSVG(style);
   } else {
-    svg = generatePlaceholderSVG(style, id, text || undefined);
+    svg = generatePlaceholderSVG(style, id);
   }
 
   // 返回SVG图片
