@@ -98,12 +98,9 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
     }
   };
 
-  // 如果没有初始数据，则在组件挂载时获取数据
   useEffect(() => {
-    if (initialData.length === 0) {
-      fetchEmojis();
-    }
-  }, []);
+    fetchEmojis(1, selectedStyle);
+  }, [selectedStyle]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('zh-CN', {

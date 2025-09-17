@@ -357,7 +357,9 @@ export default function PetEmojiGenerator() {
             {/* 下载和操作按钮 */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
-                onClick={() => downloadEmoji(generatedEmojis[0].id)}
+                onClick={() => {
+                  downloadEmoji(generatedEmojis[0].id);
+                }}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-full font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
