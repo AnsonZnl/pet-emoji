@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
-import { useToast } from './Toast';
+import toast from 'react-hot-toast';
 
 // Google Analytics gtag type
 declare global {
@@ -34,7 +34,6 @@ export default function PetEmojiGenerator() {
   const [timeUntilNextGeneration, setTimeUntilNextGeneration] = useState<number>(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addToast } = useToast();
 
   const styles = [
     { id: "cute", name: "Cute", emoji: "😊", description: "Adorable & Sweet" },
@@ -45,70 +44,59 @@ export default function PetEmojiGenerator() {
 
   // 检查最新的生成记录并计算剩余时间
   const checkGenerationAvailability = useCallback(async () => {
+    // 确保在客户端环境
+    if (typeof window === 'undefined') return;
+    
     try {
-      const response = await fetch('/api/emoji-generations?stats=true');
+      const response = await fetch('/api/rate-limit-status');
       if (response.ok) {
         const data = await response.json();
-        if (data.success && data.stats) {
-          // 这里我们需要获取最新的生成记录
-          // 暂时使用本地存储来跟踪用户的最后生成时间
-          const lastGenerationTime = localStorage.getItem('lastEmojiGeneration');
-          if (lastGenerationTime) {
-            const lastTime = new Date(lastGenerationTime);
-            const currentTime = new Date();
-            const timeDiffMs = currentTime.getTime() - lastTime.getTime();
-            const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
-            const oneHourInMinutes = 60;
-            
-            if (timeDiffMinutes < oneHourInMinutes) {
-              const remainingMinutes = oneHourInMinutes - timeDiffMinutes;
-              setTimeUntilNextGeneration(remainingMinutes);
-              setIsButtonDisabled(true);
-            } else {
-              setTimeUntilNextGeneration(0);
-              setIsButtonDisabled(false);
-            }
+        if (data.success && data.data) {
+          const { isLimited, remainingMinutes, canGenerate } = data.data;
+          
+          if (isLimited && !canGenerate) {
+            setTimeUntilNextGeneration(remainingMinutes);
+            setIsButtonDisabled(true);
+            console.log('Rate limit active, remaining:', remainingMinutes, 'minutes');
           } else {
+            setTimeUntilNextGeneration(0);
             setIsButtonDisabled(false);
+            console.log('Rate limit expired or no limit, button enabled');
           }
         }
+      } else {
+        console.warn('Failed to fetch rate limit status, enabling button');
+        setIsButtonDisabled(false);
       }
     } catch (error) {
       console.error('Error checking generation availability:', error);
+      setIsButtonDisabled(false);
     }
   }, []);
 
-  // 更新生成时间的函数
+  // 更新生成时间的函数 - 现在使用服务端API状态
   const updateGenerationTime = useCallback(() => {
-    const currentTime = new Date().toISOString();
-    localStorage.setItem('lastEmojiGeneration', currentTime);
+    // 设置本地状态，下次检查时会从服务端获取准确状态
     setTimeUntilNextGeneration(60); // 设置为60分钟
     setIsButtonDisabled(true);
-  }, []);
+    console.log('Generation completed, rate limit active for 60 minutes');
+    
+    // 立即重新检查服务端状态以确保准确性
+    setTimeout(() => {
+      checkGenerationAvailability();
+    }, 1000);
+  }, [checkGenerationAvailability]);
 
   // 启动倒计时
   useEffect(() => {
+    // 确保在客户端环境
+    if (typeof window === 'undefined') return;
+    
     checkGenerationAvailability();
     
     const interval = setInterval(() => {
-      const lastGenerationTime = localStorage.getItem('lastEmojiGeneration');
-      if (lastGenerationTime) {
-        const lastTime = new Date(lastGenerationTime);
-        const currentTime = new Date();
-        const timeDiffMs = currentTime.getTime() - lastTime.getTime();
-        const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
-        const oneHourInMinutes = 60;
-        
-        if (timeDiffMinutes < oneHourInMinutes) {
-          const remainingMinutes = oneHourInMinutes - timeDiffMinutes;
-          setTimeUntilNextGeneration(remainingMinutes);
-          setIsButtonDisabled(true);
-        } else {
-          setTimeUntilNextGeneration(0);
-          setIsButtonDisabled(false);
-        }
-      }
-    }, 60000); // 每分钟检查一次
+      checkGenerationAvailability();
+    }, 60000); // 每分钟检查一次服务端状态
 
     return () => clearInterval(interval);
   }, [checkGenerationAvailability]);
@@ -125,12 +113,12 @@ export default function PetEmojiGenerator() {
 
   const handleFileUpload = useCallback((file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      addToast({ message: "文件大小不能超过5MB", type: "error" });
+      toast.error("文件大小不能超过5MB");
       return;
     }
 
     if (!file.type.startsWith("image/")) {
-      addToast({ message: "请上传图片文件", type: "error" });
+      toast.error("请上传图片文件");
       return;
     }
 
@@ -149,7 +137,7 @@ export default function PetEmojiGenerator() {
       }
     };
     reader.readAsDataURL(file);
-  }, [addToast]);
+  }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -169,12 +157,12 @@ export default function PetEmojiGenerator() {
 
   const handleFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      addToast({ message: "File size cannot exceed 5MB", type: "error" });
+      toast.error("File size cannot exceed 5MB");
       return;
     }
 
     if (!file.type.startsWith("image/")) {
-      addToast({ message: "Please upload an image file", type: "error" });
+      toast.error("Please upload an image file");
       return;
     }
 
@@ -227,7 +215,7 @@ export default function PetEmojiGenerator() {
             message: data.message || "服务器繁忙，请稍后再试！",
           });
         } else {
-          addToast({ message: data.error || "生成失败，请重试", type: "error" });
+          toast.error(data.error || "生成失败，请重试");
         }
         return;
       }
@@ -243,7 +231,7 @@ export default function PetEmojiGenerator() {
     } catch (error) {
       console.error("Generation error:", error);
       const errorMessage = error instanceof Error ? error.message : "Generation failed, please try again";
-      addToast({ message: errorMessage, type: "error" });
+      toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
     }
@@ -310,7 +298,7 @@ export default function PetEmojiGenerator() {
       }
     } catch (error) {
       console.error("Download error:", error);
-      addToast({ message: "Download failed, please try again", type: "error" });
+      toast.error("Download failed, please try again");
       
       // 跟踪下载失败事件
       if (typeof window !== 'undefined' && window.gtag) {
@@ -434,12 +422,25 @@ export default function PetEmojiGenerator() {
               
               {/* 倒计时提示 */}
               {isButtonDisabled && timeUntilNextGeneration > 0 && (
-                <div className='mt-4 text-sm text-gray-600'>
-                  <div className='flex items-center justify-center space-x-2'>
-                    <svg className='w-4 h-4 text-blue-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
-                    </svg>
-                    <span>Rate limit active. You can generate again in {timeUntilNextGeneration} minutes.</span>
+                <div className='mt-6 max-w-md mx-auto'>
+                  <div className='bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200/50 backdrop-blur-sm'>
+                    <div className='flex items-center justify-center space-x-3'>
+                      <div className='flex-shrink-0'>
+                        <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center'>
+                          <svg className='w-4 h-4 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className='flex-1 text-center'>
+                        <p className='text-sm font-medium text-blue-800'>
+                          Rate limit active
+                        </p>
+                        <p className='text-xs text-blue-600 mt-1'>
+                          You can generate again in <span className='font-semibold'>{timeUntilNextGeneration}</span> minutes
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -501,7 +502,7 @@ export default function PetEmojiGenerator() {
                       url: window.location.href,
                     });
                   } else {
-                    addToast({ message: "Share link copied to clipboard!", type: "success" });
+                    toast.success("Share link copied to clipboard!");
                   }
                 }}
                 className='bg-white border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-purple-50 transition-all duration-300 flex items-center gap-2'
