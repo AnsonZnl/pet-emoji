@@ -44,6 +44,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      // 添加 petemojimaker.com 域名支持
+      {
+        protocol: 'https',
+        hostname: 'imgs.petemojimaker.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

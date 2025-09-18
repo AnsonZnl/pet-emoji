@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+
+// Google Analytics gtag type
+declare global {
+  interface Window {
+    gtag?: (command: string, action: string, parameters?: Record<string, unknown>) => void;
+  }
+}
 
 interface GeneratedEmoji {
   id: string;
@@ -43,16 +49,6 @@ export default function PetEmojiGenerator() {
     setDragActive(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(false);
-
-    const files = e.dataTransfer.files;
-    if (files && files[0]) {
-      handleFileUpload(files[0]);
-    }
-  }, []);
-
   const handleFileUpload = useCallback((file: File) => {
     if (file.size > 5 * 1024 * 1024) {
       alert("文件大小不能超过5MB");
@@ -70,8 +66,8 @@ export default function PetEmojiGenerator() {
       setUploadedImage(result);
       
       // 跟踪文件上传事件
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'file_upload', {
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'file_upload', {
           event_category: 'engagement',
           event_label: 'pet_photo_uploaded',
           value: Math.round(file.size / 1024), // 文件大小(KB)
@@ -81,85 +77,15 @@ export default function PetEmojiGenerator() {
     reader.readAsDataURL(file);
   }, []);
 
-  const generateEmoji = useCallback(async () => {
-    if (!uploadedImage) {
-      alert("请先上传宠物照片");
-      return;
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files[0]) {
+      handleFileUpload(files[0]);
     }
-
-    try {
-      setIsGenerating(true);
-      setRateLimitInfo({ isLimited: false }); // 清除之前的限制提示
-      
-      // 跟踪生成开始事件
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'emoji_generation_start', {
-          event_category: 'engagement',
-          event_label: `style_${selectedStyle}`,
-          value: 1,
-        });
-      }
-
-      const response = await fetch("/api/generate-emoji", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          image: uploadedImage,
-          style: selectedStyle,
-          petType: "auto-detect", // 让AI自动识别宠物类型
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          // 频率限制错误
-          setRateLimitInfo({
-            isLimited: true,
-            remainingCount: data.remainingCount || 0,
-            waitMinutes: data.waitMinutes || 0,
-            message: data.error || "服务器繁忙，请稍后再试！",
-          });
-        } else {
-          alert(data.error || "生成失败，请重试");
-        }
-        return;
-      }
-
-      if (data.success && data.emoji) {
-        // 将单个emoji对象转换为数组以保持现有组件逻辑
-        setGeneratedEmojis([data.emoji]);
-        
-        // 跟踪生成成功事件
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('event', 'emoji_generation_success', {
-            event_category: 'conversion',
-            event_label: `style_${selectedStyle}`,
-            value: 1,
-          });
-        }
-      } else {
-        throw new Error("Invalid response format");
-      }
-    } catch (error) {
-      console.error("Generation error:", error);
-      alert("生成失败，请重试");
-      
-      // 跟踪生成失败事件
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'emoji_generation_error', {
-          event_category: 'error',
-          event_label: `style_${selectedStyle}`,
-          value: 0,
-        });
-      }
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [uploadedImage, selectedStyle]);
+  }, [handleFileUpload]);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -253,8 +179,8 @@ export default function PetEmojiGenerator() {
       if (!emoji) return;
 
       // 跟踪下载开始事件
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'emoji_download_start', {
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'emoji_download_start', {
           event_category: 'engagement',
           event_label: `style_${emoji.style}`,
           value: 1,
@@ -271,8 +197,8 @@ export default function PetEmojiGenerator() {
         document.body.removeChild(link);
         
         // 跟踪下载成功事件
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('event', 'emoji_download_success', {
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'emoji_download_success', {
             event_category: 'conversion',
             event_label: `style_${emoji.style}`,
             value: 1,
@@ -299,8 +225,8 @@ export default function PetEmojiGenerator() {
       URL.revokeObjectURL(url);
       
       // 跟踪下载成功事件
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'emoji_download_success', {
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'emoji_download_success', {
           event_category: 'conversion',
           event_label: `style_${emoji.style}`,
           value: 1,
@@ -311,8 +237,8 @@ export default function PetEmojiGenerator() {
       alert("Download failed, please try again");
       
       // 跟踪下载失败事件
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'emoji_download_error', {
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'emoji_download_error', {
           event_category: 'error',
           event_label: 'download_failed',
           value: 0,
@@ -433,18 +359,17 @@ export default function PetEmojiGenerator() {
               <div className='relative group'>
                 <div className='absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity'></div>
                 <div className='relative bg-white rounded-2xl shadow-2xl p-2 md:p-4'>
-                  {generatedEmojis[0].url.startsWith("http") ? (
-                    <img
-                      src={generatedEmojis[0].url}
-                      alt={`${selectedStyle} pet emoji pack`}
-                      className='rounded-lg w-full max-w-[600px] h-auto'
-                      onError={e => {
-                        console.error("Image load error:", generatedEmojis[0].url);
-                      }}
-                    />
-                  ) : (
-                    <Image src={generatedEmojis[0].url} alt={`${selectedStyle} pet emoji pack`} width={600} height={600} className='rounded-lg w-full max-w-[600px] h-auto' priority />
-                  )}
+                  <Image 
+                    src={generatedEmojis[0].url} 
+                    alt={`${selectedStyle} pet emoji pack`} 
+                    width={600} 
+                    height={600} 
+                    className='rounded-lg w-full max-w-[600px] h-auto' 
+                    priority
+                    onError={() => {
+                      console.error("Image load error:", generatedEmojis[0].url);
+                    }}
+                  />
                 </div>
               </div>
             </div>
