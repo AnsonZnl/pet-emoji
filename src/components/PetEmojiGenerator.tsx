@@ -68,6 +68,15 @@ export default function PetEmojiGenerator() {
     reader.onload = e => {
       const result = e.target?.result as string;
       setUploadedImage(result);
+      
+      // 跟踪文件上传事件
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'file_upload', {
+          event_category: 'engagement',
+          event_label: 'pet_photo_uploaded',
+          value: Math.round(file.size / 1024), // 文件大小(KB)
+        });
+      }
     };
     reader.readAsDataURL(file);
   }, []);
@@ -81,6 +90,15 @@ export default function PetEmojiGenerator() {
     try {
       setIsGenerating(true);
       setRateLimitInfo({ isLimited: false }); // 清除之前的限制提示
+      
+      // 跟踪生成开始事件
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'emoji_generation_start', {
+          event_category: 'engagement',
+          event_label: `style_${selectedStyle}`,
+          value: 1,
+        });
+      }
 
       const response = await fetch("/api/generate-emoji", {
         method: "POST",
@@ -114,12 +132,30 @@ export default function PetEmojiGenerator() {
       if (data.success && data.emoji) {
         // 将单个emoji对象转换为数组以保持现有组件逻辑
         setGeneratedEmojis([data.emoji]);
+        
+        // 跟踪生成成功事件
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'emoji_generation_success', {
+            event_category: 'conversion',
+            event_label: `style_${selectedStyle}`,
+            value: 1,
+          });
+        }
       } else {
         throw new Error("Invalid response format");
       }
     } catch (error) {
       console.error("Generation error:", error);
       alert("生成失败，请重试");
+      
+      // 跟踪生成失败事件
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'emoji_generation_error', {
+          event_category: 'error',
+          event_label: `style_${selectedStyle}`,
+          value: 0,
+        });
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -216,6 +252,15 @@ export default function PetEmojiGenerator() {
       const emoji = generatedEmojis.find(e => e.id === emojiId);
       if (!emoji) return;
 
+      // 跟踪下载开始事件
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'emoji_download_start', {
+          event_category: 'engagement',
+          event_label: `style_${emoji.style}`,
+          value: 1,
+        });
+      }
+
       // 如果是base64图片，直接下载
       if (emoji.url.startsWith("data:image/")) {
         const link = document.createElement("a");
@@ -224,6 +269,15 @@ export default function PetEmojiGenerator() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // 跟踪下载成功事件
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'emoji_download_success', {
+            event_category: 'conversion',
+            event_label: `style_${emoji.style}`,
+            value: 1,
+          });
+        }
         return;
       }
 
@@ -243,9 +297,27 @@ export default function PetEmojiGenerator() {
 
       // 清理URL对象
       URL.revokeObjectURL(url);
+      
+      // 跟踪下载成功事件
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'emoji_download_success', {
+          event_category: 'conversion',
+          event_label: `style_${emoji.style}`,
+          value: 1,
+        });
+      }
     } catch (error) {
       console.error("Download error:", error);
       alert("Download failed, please try again");
+      
+      // 跟踪下载失败事件
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'emoji_download_error', {
+          event_category: 'error',
+          event_label: 'download_failed',
+          value: 0,
+        });
+      }
     }
   };
 
