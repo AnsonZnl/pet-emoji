@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { EmojiGeneration } from '@/lib/supabase';
 
@@ -51,12 +51,7 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
     { value: 'happy', label: 'Happy Style', emoji: '😍' }
   ];
 
-  const fetchEmojis = async (page: number = 1, style: string = '') => {
-    // 如果是同一页且同一风格，不需要重新加载
-    if (page === pagination.page && style === selectedStyle && emojis.length > 0) {
-      return;
-    }
-
+  const fetchEmojis = useCallback(async (page: number = 1, style: string = '') => {
     setLoading(true);
     setError('');
     
@@ -90,7 +85,7 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleStyleChange = (style: string) => {
     setSelectedStyle(style);
@@ -105,7 +100,7 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
 
   useEffect(() => {
     fetchEmojis(1, selectedStyle);
-  }, [selectedStyle]);
+  }, [fetchEmojis, selectedStyle]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('zh-CN', {
@@ -160,60 +155,73 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
         </div>
       )}
 
-      {/* Loading State */}
-      {loading && (
-        <div className="flex justify-center items-center py-12 animate-in fade-in-0 duration-200">
-          <div className="flex flex-col items-center space-y-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-            <span className="text-gray-600 text-sm">Loading emoji packs...</span>
-          </div>
-        </div>
-      )}
-
-      {/* Emoji Grid */}
-      {!loading && emojis.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 animate-in fade-in-0 duration-300">
-          {emojis.map((emoji) => (
-            <div
-              key={emoji.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="aspect-square relative">
-                <Image
-                  src={emoji.image_url}
-                  alt={`${emoji.style} style emoji pack`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  onError={(e) => {
-                    console.error('Image load error:', emoji.image_url);
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-purple-600">
-                    {getStyleLabel(emoji.style)}
-                  </span>
-                  {emoji.featured && (
-                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                      Featured
-                    </span>
-                  )}
+      {/* Grid + Loading Overlay (prevents height collapse) */}
+      {emojis.length > 0 ? (
+        <div className="relative">
+          {/* Grid stays mounted even during loading */}
+          <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 transition-opacity duration-200 ${loading ? 'opacity-60' : 'opacity-100'}`}>
+            {emojis.map((emoji) => (
+              <div
+                key={emoji.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="aspect-square relative">
+                  <Image
+                    src={emoji.image_url}
+                    alt={`${emoji.style} style emoji pack`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    onError={(e) => {
+                      console.error('Image load error:', emoji.image_url);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
                 </div>
-                {emoji.pet_type && (
-                  <p className="text-sm text-gray-600 mb-2">
-                    Pet Type: {emoji.pet_type}
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-purple-600">
+                      {getStyleLabel(emoji.style)}
+                    </span>
+                    {emoji.featured && (
+                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                        Featured
+                      </span>
+                    )}
+                  </div>
+                  {emoji.pet_type && (
+                    <p className="text-sm text-gray-600 mb-2">
+                      Pet Type: {emoji.pet_type}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    {formatDate(emoji.created_at)}
                   </p>
-                )}
-                <p className="text-xs text-gray-500">
-                  {formatDate(emoji.created_at)}
-                </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Loading overlay shown on top during fetch */}
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="flex flex-col items-center space-y-3 bg-white/40 backdrop-blur-sm px-4 py-6 rounded-lg">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <span className="text-gray-700 text-sm">Loading emoji packs...</span>
               </div>
             </div>
-          ))}
+          )}
         </div>
+      ) : (
+        // Fallback loading state when there is no data yet
+        loading && (
+          <div className="flex justify-center items-center py-12 animate-in fade-in-0 duration-200">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+              <span className="text-gray-600 text-sm">Loading emoji packs...</span>
+            </div>
+          </div>
+        )
       )}
 
       {/* Empty State */}

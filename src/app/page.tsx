@@ -60,7 +60,7 @@ export default async function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className='relative px-4 py-20 sm:px-6 lg:px-8 pb-0 z-10'>
+      <section className='relative px-4 py-20 sm:px-6 lg:px-8 z-10'>
         <div className='mx-auto max-w-4xl text-center'>
           <h1 className='text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl'>
             Transform Your Pet Into Amazing <span className='bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent'>Emojis</span>
@@ -82,31 +82,7 @@ export default async function Home() {
       {/* Pet Emoji Generator - 客户端交互组件 */}
       <div className='relative z-10 '>
         <PetEmojiGenerator />
-      </div>
-
-          {/* Rate Limit Notice - 在用户开始使用前告知限制 */}
-          <div className='mt-12 max-w-2xl mx-auto mb-10'>
-            <div className='bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200/50'>
-              <div className='flex items-start space-x-4'>
-                <div className='flex-shrink-0'>
-                  <div className='w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center'>
-                    <svg className='w-5 h-5 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
-                    </svg>
-                  </div>
-                </div>
-                <div className='flex-1'>
-                  <h3 className='text-base font-semibold text-gray-900 mb-2'>Rate Limiting Notice</h3>
-                  <p className='text-sm text-gray-700'>
-                      To control operational costs and ensure fair usage for all users, we have implemented a <strong>limit of one generation per user per hour</strong>.
-                      This helps us maintain the quality of our AI service while keeping it free for everyone.
-                      If you encounter a rate limit notice, please try again later. Thank you for your understanding and support!
-                  </p>
-                  
-                </div>
-              </div>
-            </div>
-          </div>
+      </div> 
         </div>
       </section>
 
@@ -173,6 +149,17 @@ export default async function Home() {
           </div>
 
           <div className='space-y-6'>
+          <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
+              <h3 className='text-lg font-semibold text-gray-900 mb-2'>Rate Limiting Notice</h3>
+              <p className='text-gray-600'>
+                
+              To control operational costs and ensure fair usage for all users, we have implemented a <strong>limit of one generation per user per hour</strong>.
+                      This helps us maintain the quality of our AI service while keeping it free for everyone.
+                      If you encounter a rate limit notice, please try again later. Thank you for your understanding and support!
+
+              </p>
+            </article>
+        
             <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>What image formats are supported?</h3>
               <p className='text-gray-600'>We support JPG, PNG, and WebP formats. Maximum file size is 5MB for optimal processing speed.</p>
