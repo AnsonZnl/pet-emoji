@@ -274,7 +274,7 @@ export default function PetEmojiGenerator() {
       )}
 
       {/* Upload Section */}
-      <section id='upload-section' className='px-4 py-16 sm:px-6 lg:px-8'>
+      <section id='upload-section' className='px-4 py-16 sm:px-6 lg:px-8 pb-0'>
         <div className='mx-auto max-w-4xl'>
           <div className='text-center mb-12'>
             <h2 className='text-3xl font-bold text-gray-900'>Upload Your Pet Photo</h2>

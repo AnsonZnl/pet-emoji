@@ -48,8 +48,19 @@ export default async function Home() {
       {/* 结构化数据 */}
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
+      {/* Global background decoration */}
+      <div className='fixed inset-0 pointer-events-none overflow-hidden'>
+        <div className='absolute top-0 left-0 w-full h-full'>
+          <div className='absolute top-20 left-10 w-64 h-64 bg-purple-200/20 rounded-full blur-3xl'></div>
+          <div className='absolute top-40 right-20 w-48 h-48 bg-pink-200/20 rounded-full blur-2xl'></div>
+          <div className='absolute bottom-40 left-1/3 w-56 h-56 bg-blue-200/20 rounded-full blur-3xl'></div>
+          <div className='absolute bottom-20 right-1/4 w-40 h-40 bg-purple-300/15 rounded-full blur-2xl'></div>
+          <div className='absolute top-1/2 left-1/4 w-32 h-32 bg-pink-300/15 rounded-full blur-xl'></div>
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className='relative px-4 py-20 sm:px-6 lg:px-8'>
+      <section className='relative px-4 py-20 sm:px-6 lg:px-8 pb-0 z-10'>
         <div className='mx-auto max-w-4xl text-center'>
           <h1 className='text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl'>
             Transform Your Pet Into Amazing <span className='bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent'>Emojis</span>
@@ -71,10 +82,24 @@ export default async function Home() {
       </section>
 
       {/* Pet Emoji Generator - 客户端交互组件 */}
-      <PetEmojiGenerator />
+      <div className='relative z-10'>
+        <PetEmojiGenerator />
+      </div>
+
+      {/* Emoji Gallery - Showcase generated emoji packs */}
+      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 backdrop-blur-sm relative z-10'>
+        <div className='mx-auto max-w-6xl'>
+          <div className='text-center mb-12'>
+            <h2 className='text-3xl font-bold text-gray-900 mb-4'>Amazing Emoji Pack Showcase</h2>
+            <p className='text-lg text-gray-600 max-w-2xl mx-auto'>Discover incredible emoji packs created by other users, get inspired, or share your own creations!</p>
+          </div>
+
+          <EmojiGallery initialData={initialEmojis} initialPagination={initialPagination} />
+        </div>
+      </section>
 
       {/* Features Section - 静态内容，SEO友好 */}
-      <section className='px-4 py-16 sm:px-6 lg:px-8'>
+      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/40 backdrop-blur-sm relative z-10'>
         <div className='mx-auto max-w-4xl'>
           <div className='text-center mb-16'>
             <h2 className='text-3xl font-bold text-gray-900'>How It Works</h2>
@@ -82,7 +107,7 @@ export default async function Home() {
           </div>
 
           <div className='grid md:grid-cols-3 gap-8'>
-            <article className='text-center'>
+            <article className='text-center bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <div className='w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4'>
                 <span className='text-2xl' role='img' aria-label='mobile phone'>
                   📱
@@ -92,7 +117,7 @@ export default async function Home() {
               <p className='text-gray-600'>Simply drag and drop or click to upload a clear photo of your beloved pet. Supports JPG, PNG, and WebP formats up to 5MB.</p>
             </article>
 
-            <article className='text-center'>
+            <article className='text-center bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <div className='w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4'>
                 <span className='text-2xl' role='img' aria-label='art palette'>
                   🎨
@@ -102,7 +127,7 @@ export default async function Home() {
               <p className='text-gray-600'>Select from cute, funny, angry, or happy styles to match your pet&apos;s personality. Our AI will generate multiple variations.</p>
             </article>
 
-            <article className='text-center'>
+            <article className='text-center bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <div className='w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4'>
                 <span className='text-2xl' role='img' aria-label='download'>
                   ⬇️
@@ -115,47 +140,35 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Emoji Gallery - Showcase generated emoji packs */}
-      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white'>
-        <div className='mx-auto max-w-6xl'>
-          <div className='text-center mb-12'>
-            <h2 className='text-3xl font-bold text-gray-900 mb-4'>Amazing Emoji Pack Showcase</h2>
-            <p className='text-lg text-gray-600 max-w-2xl mx-auto'>Discover incredible emoji packs created by other users, get inspired, or share your own creations!</p>
-          </div>
-
-          <EmojiGallery initialData={initialEmojis} initialPagination={initialPagination} />
-        </div>
-      </section>
-
       {/* FAQ Section - 静态内容，SEO友好 */}
-      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-gray-50'>
+      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 backdrop-blur-sm relative z-10'>
         <div className='mx-auto max-w-3xl'>
           <div className='text-center mb-12'>
             <h2 className='text-3xl font-bold text-gray-900'>Frequently Asked Questions</h2>
           </div>
 
-          <div className='space-y-8'>
-            <article>
+          <div className='space-y-6'>
+            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>What image formats are supported?</h3>
               <p className='text-gray-600'>We support JPG, PNG, and WebP formats. Maximum file size is 5MB for optimal processing speed.</p>
             </article>
 
-            <article>
+            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>How long does it take to generate pet emojis?</h3>
               <p className='text-gray-600'>It typically takes 10-30 seconds to generate your pet emojis using our advanced AI technology.</p>
             </article>
 
-            <article>
+            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>Are my photos stored on your servers?</h3>
               <p className='text-gray-600'>No, your photos are only temporarily processed and automatically deleted within 24 hours for your privacy and security.</p>
             </article>
 
-            <article>
+            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>Can I use the generated emojis commercially?</h3>
               <p className='text-gray-600'>Yes, you can use the generated emojis for personal and commercial purposes as they are created from your own pet photos.</p>
             </article>
 
-            <article>
+            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>What makes this pet emoji generator special?</h3>
               <p className='text-gray-600'>Our AI is specifically trained for pet emoji generation, ensuring high-quality results that capture your pet&apos;s unique characteristics and personality.</p>
             </article>
@@ -164,7 +177,7 @@ export default async function Home() {
       </section>
 
       {/* Footer - 静态内容，SEO友好 */}
-      <footer className='bg-gray-900 text-white px-4 py-12 sm:px-6 lg:px-8'>
+      <footer className='bg-gray-900/95 backdrop-blur-sm text-white px-4 py-12 sm:px-6 lg:px-8 relative z-10'>
         <div className='mx-auto max-w-4xl'>
           <div className='text-center'>
             <h3 className='text-2xl font-bold mb-4'>Pet Emoji Generator</h3>
