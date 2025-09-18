@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
+import { useToast } from './Toast';
 
 // Google Analytics gtag type
 declare global {
@@ -30,7 +31,10 @@ export default function PetEmojiGenerator() {
   const [generatedEmojis, setGeneratedEmojis] = useState<GeneratedEmoji[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [rateLimitInfo, setRateLimitInfo] = useState<RateLimitInfo>({ isLimited: false });
+  const [timeUntilNextGeneration, setTimeUntilNextGeneration] = useState<number>(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addToast } = useToast();
 
   const styles = [
     { id: "cute", name: "Cute", emoji: "😊", description: "Adorable & Sweet" },
@@ -38,6 +42,76 @@ export default function PetEmojiGenerator() {
     { id: "angry", name: "Angry", emoji: "😠", description: "Grumpy & Mad" },
     { id: "happy", name: "Happy", emoji: "😍", description: "Joyful & Excited" },
   ];
+
+  // 检查最新的生成记录并计算剩余时间
+  const checkGenerationAvailability = useCallback(async () => {
+    try {
+      const response = await fetch('/api/emoji-generations?stats=true');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.stats) {
+          // 这里我们需要获取最新的生成记录
+          // 暂时使用本地存储来跟踪用户的最后生成时间
+          const lastGenerationTime = localStorage.getItem('lastEmojiGeneration');
+          if (lastGenerationTime) {
+            const lastTime = new Date(lastGenerationTime);
+            const currentTime = new Date();
+            const timeDiffMs = currentTime.getTime() - lastTime.getTime();
+            const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
+            const oneHourInMinutes = 60;
+            
+            if (timeDiffMinutes < oneHourInMinutes) {
+              const remainingMinutes = oneHourInMinutes - timeDiffMinutes;
+              setTimeUntilNextGeneration(remainingMinutes);
+              setIsButtonDisabled(true);
+            } else {
+              setTimeUntilNextGeneration(0);
+              setIsButtonDisabled(false);
+            }
+          } else {
+            setIsButtonDisabled(false);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking generation availability:', error);
+    }
+  }, []);
+
+  // 更新生成时间的函数
+  const updateGenerationTime = useCallback(() => {
+    const currentTime = new Date().toISOString();
+    localStorage.setItem('lastEmojiGeneration', currentTime);
+    setTimeUntilNextGeneration(60); // 设置为60分钟
+    setIsButtonDisabled(true);
+  }, []);
+
+  // 启动倒计时
+  useEffect(() => {
+    checkGenerationAvailability();
+    
+    const interval = setInterval(() => {
+      const lastGenerationTime = localStorage.getItem('lastEmojiGeneration');
+      if (lastGenerationTime) {
+        const lastTime = new Date(lastGenerationTime);
+        const currentTime = new Date();
+        const timeDiffMs = currentTime.getTime() - lastTime.getTime();
+        const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
+        const oneHourInMinutes = 60;
+        
+        if (timeDiffMinutes < oneHourInMinutes) {
+          const remainingMinutes = oneHourInMinutes - timeDiffMinutes;
+          setTimeUntilNextGeneration(remainingMinutes);
+          setIsButtonDisabled(true);
+        } else {
+          setTimeUntilNextGeneration(0);
+          setIsButtonDisabled(false);
+        }
+      }
+    }, 60000); // 每分钟检查一次
+
+    return () => clearInterval(interval);
+  }, [checkGenerationAvailability]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -51,12 +125,12 @@ export default function PetEmojiGenerator() {
 
   const handleFileUpload = useCallback((file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert("文件大小不能超过5MB");
+      addToast({ message: "文件大小不能超过5MB", type: "error" });
       return;
     }
 
     if (!file.type.startsWith("image/")) {
-      alert("请上传图片文件");
+      addToast({ message: "请上传图片文件", type: "error" });
       return;
     }
 
@@ -75,7 +149,7 @@ export default function PetEmojiGenerator() {
       }
     };
     reader.readAsDataURL(file);
-  }, []);
+  }, [addToast]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -95,12 +169,12 @@ export default function PetEmojiGenerator() {
 
   const handleFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size cannot exceed 5MB");
+      addToast({ message: "File size cannot exceed 5MB", type: "error" });
       return;
     }
 
     if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file");
+      addToast({ message: "Please upload an image file", type: "error" });
       return;
     }
 
@@ -153,7 +227,7 @@ export default function PetEmojiGenerator() {
             message: data.message || "服务器繁忙，请稍后再试！",
           });
         } else {
-          alert(data.error || "生成失败，请重试");
+          addToast({ message: data.error || "生成失败，请重试", type: "error" });
         }
         return;
       }
@@ -161,13 +235,15 @@ export default function PetEmojiGenerator() {
       if (data.success && data.emoji) {
         // 将单个emoji对象转换为数组以保持现有组件逻辑
         setGeneratedEmojis([data.emoji]);
+        // 更新生成时间
+        updateGenerationTime();
       } else {
         throw new Error("Invalid response format");
       }
     } catch (error) {
       console.error("Generation error:", error);
       const errorMessage = error instanceof Error ? error.message : "Generation failed, please try again";
-      alert(errorMessage);
+      addToast({ message: errorMessage, type: "error" });
     } finally {
       setIsGenerating(false);
     }
@@ -234,7 +310,7 @@ export default function PetEmojiGenerator() {
       }
     } catch (error) {
       console.error("Download error:", error);
-      alert("Download failed, please try again");
+      addToast({ message: "Download failed, please try again", type: "error" });
       
       // 跟踪下载失败事件
       if (typeof window !== 'undefined' && window.gtag) {
@@ -251,7 +327,7 @@ export default function PetEmojiGenerator() {
     <>
       {/* 频率限制提示 */}
       {rateLimitInfo.isLimited && (
-        <div className='px-4 py-8 sm:px-6 lg:px-8'>
+        <div className='px-4 py-8 sm:px-6 lg:px-8 pb-0'>
           <div className='mx-auto max-w-4xl'>
             <div className='p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
               <div className='flex items-center'>
@@ -274,7 +350,7 @@ export default function PetEmojiGenerator() {
       )}
 
       {/* Upload Section */}
-      <section id='upload-section' className='px-4 py-16 sm:px-6 lg:px-8'>
+      <section id='upload-section' className='px-4 py-16 sm:px-6 lg:px-8 pb-0'>
         <div className='mx-auto max-w-4xl'>
           <div className='text-center mb-12'>
             <h2 className='text-3xl font-bold text-gray-900'>Upload Your Pet Photo</h2>
@@ -327,7 +403,15 @@ export default function PetEmojiGenerator() {
           {/* Generate Button */}
           {uploadedImage && (
             <div className='mt-12 text-center'>
-              <button onClick={generateEmojis} disabled={isGenerating} className='inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:from-purple-500 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all'>
+              <button 
+                onClick={generateEmojis} 
+                disabled={isGenerating || isButtonDisabled} 
+                className={`inline-flex items-center px-8 py-4 font-semibold rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all ${
+                  isButtonDisabled 
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500 focus:ring-purple-500'
+                } ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
                 {isGenerating ? (
                   <>
                     <svg className='animate-spin -ml-1 mr-3 h-5 w-5 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
@@ -336,10 +420,29 @@ export default function PetEmojiGenerator() {
                     </svg>
                     Generating... (10-30 seconds)
                   </>
+                ) : isButtonDisabled ? (
+                  <>
+                    <svg className='-ml-1 mr-3 h-5 w-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
+                    </svg>
+                    Wait {timeUntilNextGeneration} minutes to generate
+                  </>
                 ) : (
                   <>✨ Generate Pet Emojis</>
                 )}
               </button>
+              
+              {/* 倒计时提示 */}
+              {isButtonDisabled && timeUntilNextGeneration > 0 && (
+                <div className='mt-4 text-sm text-gray-600'>
+                  <div className='flex items-center justify-center space-x-2'>
+                    <svg className='w-4 h-4 text-blue-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+                    </svg>
+                    <span>Rate limit active. You can generate again in {timeUntilNextGeneration} minutes.</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -398,7 +501,7 @@ export default function PetEmojiGenerator() {
                       url: window.location.href,
                     });
                   } else {
-                    alert("Share link copied to clipboard!");
+                    addToast({ message: "Share link copied to clipboard!", type: "success" });
                   }
                 }}
                 className='bg-white border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-purple-50 transition-all duration-300 flex items-center gap-2'
