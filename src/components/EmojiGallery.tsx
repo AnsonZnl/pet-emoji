@@ -33,7 +33,7 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
   const [emojis, setEmojis] = useState<EmojiGeneration[]>(initialData);
   const [pagination, setPagination] = useState(initialPagination || {
     page: 1,
-    limit: 12,
+    limit: 8,
     total: 0,
     totalPages: 0,
     hasNext: false,
@@ -52,13 +52,18 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
   ];
 
   const fetchEmojis = async (page: number = 1, style: string = '') => {
+    // 如果是同一页且同一风格，不需要重新加载
+    if (page === pagination.page && style === selectedStyle && emojis.length > 0) {
+      return;
+    }
+
     setLoading(true);
     setError('');
     
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '12'
+        limit: '8'
       });
       
       if (style) {
@@ -93,7 +98,7 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
+    if (newPage >= 1 && newPage <= pagination.totalPages && newPage !== pagination.page) {
       fetchEmojis(newPage, selectedStyle);
     }
   };
@@ -157,15 +162,17 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
 
       {/* Loading State */}
       {loading && (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          <span className="ml-2 text-gray-600">Loading...</span>
+        <div className="flex justify-center items-center py-12 animate-in fade-in-0 duration-200">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            <span className="text-gray-600 text-sm">Loading emoji packs...</span>
+          </div>
         </div>
       )}
 
       {/* Emoji Grid */}
       {!loading && emojis.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 animate-in fade-in-0 duration-300">
           {emojis.map((emoji) => (
             <div
               key={emoji.id}
@@ -235,9 +242,12 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
       {!loading && emojis.length > 0 && pagination.totalPages > 1 && (
         <div className="flex justify-center items-center space-x-2">
           <button
-            onClick={() => handlePageChange(pagination.page - 1)}
+            onClick={(e) => {
+              e.preventDefault();
+              handlePageChange(pagination.page - 1);
+            }}
             disabled={!pagination.hasPrev}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95"
           >
             Previous
           </button>
@@ -250,11 +260,14 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
               return (
                 <button
                   key={pageNum}
-                  onClick={() => handlePageChange(pageNum)}
-                  className={`px-3 py-2 text-sm font-medium rounded-md ${
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageChange(pageNum);
+                  }}
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 active:scale-95 ${
                     pageNum === pagination.page
-                      ? 'bg-purple-600 text-white'
-                      : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                      ? 'bg-purple-600 text-white shadow-lg'
+                      : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:shadow-md'
                   }`}
                 >
                   {pageNum}
@@ -264,9 +277,12 @@ export default function EmojiGallery({ initialData = [], initialPagination }: Em
           </div>
 
           <button
-            onClick={() => handlePageChange(pagination.page + 1)}
+            onClick={(e) => {
+              e.preventDefault();
+              handlePageChange(pagination.page + 1);
+            }}
             disabled={!pagination.hasNext}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95"
           >
             Next
           </button>

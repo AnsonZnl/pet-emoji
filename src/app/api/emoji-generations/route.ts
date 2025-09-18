@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     
     // 获取查询参数
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '12');
+    const limit = parseInt(searchParams.get('limit') || '8');
     const style = searchParams.get('style') || undefined;
     const featured = searchParams.get('featured') === 'true' ? true : undefined;
     const stats = searchParams.get('stats') === 'true';

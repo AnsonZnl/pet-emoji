@@ -29,7 +29,7 @@ export default async function Home() {
   let initialPagination = undefined;
 
   try {
-    const result = await getEmojiGenerations({ page: 1, limit: 12 });
+    const result = await getEmojiGenerations({ page: 1, limit: 8 });
     initialEmojis = result.data;
     initialPagination = {
       page: result.page,
@@ -71,7 +71,7 @@ export default async function Home() {
               Get Started
             </ScrollButton>
           </div>
-          <div className='mt-8 flex justify-center items-center space-x-2 text-xl'>
+          <div className='mt-8 flex justify-center items-center space-x-2 text-2xl text-gray-900 '>
             <span>✨ Free</span>
             <span>•</span>
             <span>⚡ Fast</span>

@@ -51,7 +51,7 @@ export async function insertEmojiGeneration(data: Omit<EmojiGeneration, 'id' | '
 // 获取生成记录（分页）
 export async function getEmojiGenerations({
   page = 1,
-  limit = 12,
+  limit = 8,
   style,
   featured
 }: {
@@ -71,28 +71,43 @@ export async function getEmojiGenerations({
     };
   }
 
-  let query = supabase
+  // 构建基础查询条件
+  let countQuery = supabase
+    .from('emoji_generations')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_public', true)
+
+  let dataQuery = supabase
     .from('emoji_generations')
     .select('*')
     .eq('is_public', true)
-    .order('created_at', { ascending: false })
 
   // 添加筛选条件
   if (style) {
-    query = query.eq('style', style)
+    countQuery = countQuery.eq('style', style)
+    dataQuery = dataQuery.eq('style', style)
   }
 
   if (featured !== undefined) {
-    query = query.eq('featured', featured)
+    countQuery = countQuery.eq('featured', featured)
+    dataQuery = dataQuery.eq('featured', featured)
   }
 
-  // 分页
+  // 先获取总数
+  const { count, error: countError } = await countQuery;
+
+  if (countError) {
+    console.error('Error counting emoji generations:', countError)
+    throw countError
+  }
+
+  // 再获取分页数据
   const from = (page - 1) * limit
   const to = from + limit - 1
 
-  const { data, error, count } = await query
+  const { data, error } = await dataQuery
+    .order('created_at', { ascending: false })
     .range(from, to)
-    .limit(limit)
 
   if (error) {
     console.error('Error fetching emoji generations:', error)
