@@ -44,6 +44,7 @@ export const metadata: Metadata = {
   other: {
     "msvalidate.01": "07DF65238CA0CE3FBA47F0F2190B65E8",
     "google-site-verification": "mZtGqVoq9AKOtXfhea_eVIjt0IBd5yfviTeo_PWMKv8",
+    "google-adsense-account": "ca-pub-4405660368108333",
   },
 };
 
