@@ -189,7 +189,7 @@ export default async function Home() {
           <div className='text-center'>
             <h3 className='text-2xl font-bold mb-4'>Pet Emoji Generator</h3>
             <p className='text-gray-400 mb-8'>Transform your pet photos into amazing emojis with AI technology. Free, fast, and fun for all pet lovers worldwide.</p>
-
+{/* 
             <nav className='flex justify-center space-x-8 text-sm mb-8'>
               <a href='#' className='text-gray-400 hover:text-white transition-colors'>
                 Privacy Policy
@@ -203,7 +203,7 @@ export default async function Home() {
               <a href='#' className='text-gray-400 hover:text-white transition-colors'>
                 About
               </a>
-            </nav>
+            </nav> */}
 
             <div className='mt-8 pt-8 border-t border-gray-800 text-gray-400 text-sm'>
               <p>© {new Date().getFullYear()} Pet Emoji Generator. All rights reserved.</p>
