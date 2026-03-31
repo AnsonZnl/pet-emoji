@@ -169,12 +169,7 @@ export default async function Home() {
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>How long does it take to generate pet emojis?</h3>
               <p className='text-gray-600'>It typically takes 10-30 seconds to generate your pet emojis using our advanced AI technology.</p>
             </article>
-
-            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
-              <h3 className='text-lg font-semibold text-gray-900 mb-2'>Are my photos stored on your servers?</h3>
-              <p className='text-gray-600'>No, your photos are only temporarily processed and automatically deleted within 24 hours for your privacy and security.</p>
-            </article>
-
+ 
             <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>Can I use the generated emojis commercially?</h3>
               <p className='text-gray-600'>Yes, you can use the generated emojis for personal and commercial purposes as they are created from your own pet photos.</p>
