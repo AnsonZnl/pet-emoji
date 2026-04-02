@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PetEmojiGenerator from "@/components/PetEmojiGenerator";
 import ScrollButton from "@/components/ScrollButton";
 import EmojiGallery from "@/components/EmojiGallery";
@@ -99,40 +100,34 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Features Section - 静态内容，SEO友好 */}
-      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/40 backdrop-blur-sm relative z-10'>
+      {/* Features Section */}
+      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 relative z-10'>
         <div className='mx-auto max-w-4xl'>
-          <div className='text-center mb-16'>
+          <div className='text-center mb-12'>
             <h2 className='text-3xl font-bold text-gray-900'>How It Works</h2>
             <p className='mt-4 text-gray-600'>Create amazing pet emojis in just three simple steps</p>
           </div>
 
           <div className='grid md:grid-cols-3 gap-8'>
-            <article className='text-center bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
+            <article className='text-center bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
               <div className='w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                <span className='text-2xl' role='img' aria-label='mobile phone'>
-                  📱
-                </span>
+                <span className='text-2xl'>📱</span>
               </div>
               <h3 className='text-xl font-semibold text-gray-900 mb-2'>Upload Your Pet Photo</h3>
               <p className='text-gray-600'>Simply drag and drop or click to upload a clear photo of your beloved pet. Supports JPG, PNG, and WebP formats up to 5MB.</p>
             </article>
 
-            <article className='text-center bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
+            <article className='text-center bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
               <div className='w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                <span className='text-2xl' role='img' aria-label='art palette'>
-                  🎨
-                </span>
+                <span className='text-2xl'>🎨</span>
               </div>
               <h3 className='text-xl font-semibold text-gray-900 mb-2'>Choose Emoji Style</h3>
               <p className='text-gray-600'>Select from cute, funny, angry, or happy styles to match your pet&apos;s personality. Our AI will generate multiple variations.</p>
             </article>
 
-            <article className='text-center bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
+            <article className='text-center bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
               <div className='w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                <span className='text-2xl' role='img' aria-label='download'>
-                  ⬇️
-                </span>
+                <span className='text-2xl'>⬇️</span>
               </div>
               <h3 className='text-xl font-semibold text-gray-900 mb-2'>Download & Share</h3>
               <p className='text-gray-600'>Get your AI-generated pet emojis instantly and share them with friends and family. Perfect for social media and messaging apps.</p>
@@ -141,80 +136,91 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* FAQ Section - 静态内容，SEO友好 */}
-      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 backdrop-blur-sm relative z-10'>
+      {/* Pet Types Section */}
+      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/40 relative z-10'>
+        <div className='mx-auto max-w-6xl'>
+          <div className='text-center mb-12'>
+            <h2 className='text-3xl font-bold text-gray-900 mb-4'>Works With All Pet Types</h2>
+            <p className='text-gray-600'>Our AI recognizes and generates emojis for various pets</p>
+          </div>
+          <div className='grid grid-cols-4 md:grid-cols-8 gap-4 text-center'>
+            {['🐕', '🐱', '🐦', '🐰', '🐹', '🐠', '🦎', '🐾'].map((emoji, i) => (
+              <div key={i} className='bg-white rounded-xl p-4 shadow-sm'>{emoji}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id='faq' className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 relative z-10'>
         <div className='mx-auto max-w-3xl'>
           <div className='text-center mb-12'>
             <h2 className='text-3xl font-bold text-gray-900'>Frequently Asked Questions</h2>
           </div>
 
           <div className='space-y-6'>
-          <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
-              <h3 className='text-lg font-semibold text-gray-900 mb-2'>Rate Limiting Notice</h3>
-              <p className='text-gray-600'>
-                
-              To control operational costs and ensure fair usage for all users, we have implemented a <strong>limit of one generation per user per hour</strong>.
-                      This helps us maintain the quality of our AI service while keeping it free for everyone.
-                      If you encounter a rate limit notice, please try again later. Thank you for your understanding and support!
-
-              </p>
-            </article>
-        
-            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
+            <article className='bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>What image formats are supported?</h3>
-              <p className='text-gray-600'>We support JPG, PNG, and WebP formats. Maximum file size is 5MB for optimal processing speed.</p>
+              <p className='text-gray-600'>We support JPG, PNG, and WebP formats. Maximum file size is 5MB. For best results, use clear photos with your pet facing the camera.</p>
             </article>
 
-            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
+            <article className='bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>How long does it take to generate pet emojis?</h3>
-              <p className='text-gray-600'>It typically takes 10-30 seconds to generate your pet emojis using our advanced AI technology.</p>
-            </article>
- 
-            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
-              <h3 className='text-lg font-semibold text-gray-900 mb-2'>Can I use the generated emojis commercially?</h3>
-              <p className='text-gray-600'>Yes, you can use the generated emojis for personal and commercial purposes as they are created from your own pet photos.</p>
+              <p className='text-gray-600'>It typically takes 10-30 seconds to generate your pet emojis using our advanced AI technology. You will receive a 9-panel emoji pack.</p>
             </article>
 
-            <article className='bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20'>
-              <h3 className='text-lg font-semibold text-gray-900 mb-2'>What makes this pet emoji generator special?</h3>
-              <p className='text-gray-600'>Our AI is specifically trained for pet emoji generation, ensuring high-quality results that capture your pet&apos;s unique characteristics and personality.</p>
+            <article className='bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
+              <h3 className='text-lg font-semibold text-gray-900 mb-2'>Can I use the generated emojis commercially?</h3>
+              <p className='text-gray-600'>Yes, you retain full rights to use the generated emojis for both personal and commercial purposes since they are created from your own pet photos.</p>
+            </article>
+
+            <article className='bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
+              <h3 className='text-lg font-semibold text-gray-900 mb-2'>Is there a limit on how many emojis I can generate?</h3>
+              <p className='text-gray-600'>To ensure fair access for all users, we limit each user to one emoji generation per hour. This helps us keep the service free while maintaining quality.</p>
+            </article>
+
+            <article className='bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
+              <h3 className='text-lg font-semibold text-gray-900 mb-2'>What types of pets can I create emojis for?</h3>
+              <p className='text-gray-600'>Our AI works with dogs, cats, birds, rabbits, hamsters, fish, reptiles, and more. Clear front-facing photos produce the best results.</p>
             </article>
           </div>
         </div>
       </section>
 
-      {/* Footer - 静态内容，SEO友好 */}
-      <footer className='bg-gray-900/95 backdrop-blur-sm text-white px-4 py-12 sm:px-6 lg:px-8 relative z-10'>
-        <div className='mx-auto max-w-4xl'>
-          <div className='text-center'>
-            <h3 className='text-2xl font-bold mb-4'>Pet Emoji Generator</h3>
-            <p className='text-gray-400 mb-8'>Transform your pet photos into amazing emojis with AI technology. Free, fast, and fun for all pet lovers worldwide.</p>
-{/* 
-            <nav className='flex justify-center space-x-8 text-sm mb-8'>
-              <a href='#' className='text-gray-400 hover:text-white transition-colors'>
-                Privacy Policy
-              </a>
-              <a href='#' className='text-gray-400 hover:text-white transition-colors'>
-                Terms of Service
-              </a>
-              <a href='#' className='text-gray-400 hover:text-white transition-colors'>
-                Contact
-              </a>
-              <a href='#' className='text-gray-400 hover:text-white transition-colors'>
-                About
-              </a>
-            </nav> */}
-
-            <div className='mt-8 pt-8 border-t border-gray-800 text-gray-400 text-sm'>
-              <p>© {new Date().getFullYear()} Pet Emoji Generator. All rights reserved.</p>
-              <p className='mt-2'>Made with ❤️ for pet lovers everywhere</p>
-              <p className='mt-4'>
-                For feedback or business cooperation, please contact:
-                <a href='mailto:zhangningle2017@gmail.com' className='text-blue-400 hover:text-blue-300 transition-colors ml-1'>
-                  zhangningle2017@gmail.com
-                </a>
+      {/* Footer */}
+      <footer className='bg-gray-900 text-white px-4 py-12'>
+        <div className='mx-auto max-w-6xl'>
+          <div className='grid md:grid-cols-3 gap-8 mb-8'>
+            <div>
+              <h3 className='text-xl font-bold mb-4'>Pet Emoji Generator</h3>
+              <p className='text-gray-400 text-sm'>
+                Transform your pet photos into amazing emojis with AI. Free, fast, and fun for all pet lovers.
               </p>
             </div>
+            <div>
+              <h4 className='font-semibold mb-4'>Quick Links</h4>
+              <ul className='space-y-2 text-gray-400 text-sm'>
+                <li><Link href='/#upload-section' className='hover:text-white'>Create Emojis</Link></li>
+                <li><Link href='/#gallery' className='hover:text-white'>Gallery</Link></li>
+                <li><Link href='/about' className='hover:text-white'>About</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className='font-semibold mb-4'>Legal</h4>
+              <ul className='space-y-2 text-gray-400 text-sm'>
+                <li><Link href='/privacy' className='hover:text-white'>Privacy Policy</Link></li>
+                <li><Link href='/terms' className='hover:text-white'>Terms of Service</Link></li>
+                <li><Link href='/contact' className='hover:text-white'>Contact Us</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className='pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4'>
+            <p className='text-gray-400 text-sm'>
+              © {new Date().getFullYear()} Pet Emoji Generator. All rights reserved.
+            </p>
+            <p className='text-gray-400 text-sm'>
+              Contact: <a href='mailto:zhangningle2017@gmail.com' className='text-blue-400 hover:text-blue-300'>zhangningle2017@gmail.com</a>
+            </p>
           </div>
         </div>
       </footer>
