@@ -2,6 +2,7 @@ import Link from "next/link";
 import PetEmojiGenerator from "@/components/PetEmojiGenerator";
 import ScrollButton from "@/components/ScrollButton";
 import EmojiGallery from "@/components/EmojiGallery";
+import AdSense from "@/components/AdSense";
 import { getEmojiGenerations } from "@/lib/supabase";
 
 // 结构化数据用于SEO
@@ -88,8 +89,10 @@ export default async function Home() {
       </section>
 
 
+
+
       {/* Emoji Gallery - Showcase generated emoji packs */}
-      <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 backdrop-blur-sm relative z-10'>
+      <section id='gallery' className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 backdrop-blur-sm relative z-10'>
         <div className='mx-auto max-w-6xl'>
           <div className='text-center mb-12'>
             <h2 className='text-3xl font-bold text-gray-900 mb-4'>Amazing Emoji Pack Showcase</h2>
@@ -99,6 +102,8 @@ export default async function Home() {
           <EmojiGallery initialData={initialEmojis} initialPagination={initialPagination} />
         </div>
       </section>
+
+
 
       {/* Features Section */}
       <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/60 relative z-10'>
@@ -135,6 +140,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+
 
       {/* Pet Types Section */}
       <section className='px-4 py-16 sm:px-6 lg:px-8 bg-white/40 relative z-10'>
@@ -186,6 +193,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* AdSense */}
+      <AdSense className="py-8" />
 
       {/* Footer */}
       <footer className='bg-gray-900 text-white px-4 py-12'>
